@@ -5,6 +5,18 @@ export interface TranscriptData {
   transcript: string;
   source: 'lib' | 'api_fallback';
   videoId: string;
+  title: string;
+}
+
+async function getVideoTitle(url: string): Promise<string> {
+  try {
+    const response = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`);
+    if (!response.ok) return "Untitled Video";
+    const data = await response.json();
+    return data.title || "Untitled Video";
+  } catch {
+    return "Untitled Video";
+  }
 }
 
 export async function getTranscript(url: string): Promise<TranscriptData> {
@@ -13,6 +25,8 @@ export async function getTranscript(url: string): Promise<TranscriptData> {
   if (!videoId) {
     throw new Error('Invalid YouTube URL');
   }
+
+  const title = await getVideoTitle(url);
 
   try {
     // Primary: youtube-transcript (InnerTube API / Scraping)
@@ -27,16 +41,18 @@ export async function getTranscript(url: string): Promise<TranscriptData> {
       transcript: transcriptItems.map((item) => item.text).join(' '),
       source: 'lib',
       videoId,
+      title,
     };
   } catch (error) {
     console.warn(`[TranscriptService] Primary fetch failed for ${videoId}:`, error instanceof Error ? error.message : error);
     
     // Fallback: Supadata API
-    return await fetchSupadataTranscript(url, videoId);
+    const fallbackData = await fetchSupadataTranscript(url, videoId);
+    return { ...fallbackData, title };
   }
 }
 
-async function fetchSupadataTranscript(url: string, videoId: string): Promise<TranscriptData> {
+async function fetchSupadataTranscript(url: string, videoId: string): Promise<Omit<TranscriptData, 'title'>> {
   const apiKey = process.env.SUPADATA_API_KEY;
   if (!apiKey) {
     throw new Error('Supadata API key is not configured and primary fetch failed');

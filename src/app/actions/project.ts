@@ -33,7 +33,7 @@ export async function tryForFreeAction(url: string) {
   const identifier = `${fingerprint}:${ip}`;
   const { success } = await freeRatelimit.limit(identifier);
   if (!success) {
-    throw new Error("Free limit reached (1 per 24h). Sign up to unlock unlimited!");
+    throw new Error("Free limit reached (3 per 24h). Sign up to unlock unlimited!");
   }
 
   // 4. Get Transcript
@@ -45,6 +45,7 @@ export async function tryForFreeAction(url: string) {
   // 6. Return data (do not save to DB yet to keep it simple and avoid schema issues)
   return { 
     videoId: transcriptData.videoId,
+    title: transcriptData.title,
     scripts 
   };
 }
@@ -79,7 +80,7 @@ export async function createProjectAction(url: string) {
     id: projectId,
     userId,
     youtubeUrl: url,
-    videoTitle: `Video ${transcriptData.videoId}`,
+    videoTitle: transcriptData.title,
     transcriptSource: transcriptData.source,
     briefs: scripts,
   });

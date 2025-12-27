@@ -14,7 +14,7 @@ export function LandingPage() {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<{ videoId: string; scripts: AiOutput } | null>(null);
+  const [result, setResult] = useState<{ videoId: string; title: string; scripts: AiOutput } | null>(null);
 
   const handleTryForFree = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,7 +31,9 @@ export function LandingPage() {
         document.getElementById("results")?.scrollIntoView({ behavior: "smooth" });
       }, 100);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      console.error("Action error:", err);
+      const message = err instanceof Error ? err.message : (typeof err === "string" ? err : "Something went wrong");
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -180,7 +182,7 @@ export function LandingPage() {
                     </span>
                   </div>
                   <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight">
-                    10 Viral Clips Generated
+                    {result.title}
                   </h2>
                   <p className="text-gray-400 mt-2">
                     Video ID: <span className="text-white font-medium">{result.videoId}</span>

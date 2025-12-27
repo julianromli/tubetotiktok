@@ -1,7 +1,6 @@
 import { getProjectAction } from "@/app/actions/project";
 import { ProjectGrid } from "@/components/dashboard/ProjectGrid";
 import { BriefCard } from "@/components/dashboard/BriefCard";
-import { notFound } from "next/navigation";
 import { AiScript } from "@/lib/validations/ai-output";
 import { Suspense } from "react";
 import { extractYoutubeId } from "@/lib/validations/youtube";
@@ -41,7 +40,7 @@ async function ProjectContent({
     return (
       <div className="flex flex-col items-center justify-center h-full p-8 text-center">
         <h2 className="text-2xl font-bold text-white mb-2">No scripts found</h2>
-        <p className="text-text-muted mb-6">This project doesn't have any generated scripts yet.</p>
+        <p className="text-text-muted mb-6">This project doesn&apos;t have any generated scripts yet.</p>
       </div>
     );
   }
@@ -64,19 +63,23 @@ async function ProjectContent({
 
       <div className="flex-1 overflow-y-auto px-8 py-10 z-10 custom-scrollbar">
         <ProjectGrid>
-          {briefs.map((brief, index) => (
-            <BriefCard
-              key={index}
-              id={`${id}-${index}`}
-              title={`Clip #${index + 1}`}
-              hook={brief.hook}
-              script_body={brief.script_body}
-              cta={brief.cta}
-              visual_cue={brief.visual_cue}
-              viralScore={Math.floor(Math.random() * (100 - 85) + 85) / 10}
-              thumbnailUrl={thumbnailUrl}
-            />
-          ))}
+          {briefs.map((brief, index) => {
+            const viralScore = 8.5 + (index % 15) / 10; // Deterministic placeholder
+            
+            return (
+              <BriefCard
+                key={index}
+                id={`${id}-${index}`}
+                title={`Clip #${index + 1}`}
+                hook={brief.hook}
+                script_body={brief.script_body}
+                cta={brief.cta}
+                visual_cue={brief.visual_cue}
+                viralScore={viralScore}
+                thumbnailUrl={thumbnailUrl}
+              />
+            );
+          })}
         </ProjectGrid>
       </div>
     </div>
