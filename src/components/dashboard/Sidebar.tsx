@@ -9,13 +9,14 @@ import {
   Settings, 
   CreditCard, 
   PlusCircle,
-  Video
+  Video,
+  LogOut
 } from "lucide-react";
 import { useState } from "react";
 import { NewProjectModal } from "./NewProjectModal";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { UserButton, useUser } from "@clerk/nextjs";
+import { UserButton, useUser, SignOutButton } from "@clerk/nextjs";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -97,6 +98,12 @@ export function Sidebar() {
             <CreditCard className="w-5 h-5" />
             Billing
           </Link>
+          <SignOutButton redirectUrl="/">
+            <button className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-500/10 text-gray-400 hover:text-red-500 font-medium transition-colors w-full text-left cursor-pointer mt-2 border border-transparent hover:border-red-500/20">
+              <LogOut className="w-5 h-5" />
+              Logout
+            </button>
+          </SignOutButton>
         </nav>
       </div>
 
