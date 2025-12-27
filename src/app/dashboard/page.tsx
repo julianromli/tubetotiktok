@@ -4,8 +4,18 @@ import { Search, Plus, Video } from "lucide-react";
 import { getProjectsAction } from "@/app/actions/project";
 import Link from "next/link";
 import { AiScript } from "@/lib/validations/ai-output";
+import { Suspense } from "react";
+import { extractYoutubeId } from "@/lib/validations/youtube";
 
-export default async function DashboardPage() {
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<DashboardLoading />}>
+      <DashboardContent />
+    </Suspense>
+  );
+}
+
+async function DashboardContent() {
   const projects = await getProjectsAction();
 
   return (
@@ -56,6 +66,10 @@ export default async function DashboardPage() {
             {projects.map((project) => {
               const briefs = (project.briefs || []) as AiScript[];
               const firstBrief = briefs[0];
+              const videoId = extractYoutubeId(project.youtubeUrl);
+              const thumbnailUrl = videoId 
+                ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
+                : `https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1074&auto=format&fit=crop&sig=${project.id}`;
               
               return (
                 <Link key={project.id} href={`/dashboard/project/${project.id}`}>
@@ -67,7 +81,7 @@ export default async function DashboardPage() {
                     cta={firstBrief?.cta || ""}
                     visual_cue={firstBrief?.visual_cue || ""}
                     viralScore={9.5} // Placeholder
-                    thumbnailUrl={`https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1074&auto=format&fit=crop&sig=${project.id}`}
+                    thumbnailUrl={thumbnailUrl}
                     isLocked={false}
                   />
                 </Link>
@@ -77,5 +91,14 @@ export default async function DashboardPage() {
         )}
       </div>
     </>
+  );
+}
+
+function DashboardLoading() {
+  return (
+    <div className="flex flex-col items-center justify-center h-full p-8 text-center">
+      <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+      <p className="text-gray-400">Loading your projects...</p>
+    </div>
   );
 }
